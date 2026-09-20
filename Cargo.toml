@@ -1,5 +1,5 @@
 [package]
-name = "phosphor"
+name = "phosphor-screensaver"
 version = "0.2.0"
 edition = "2024"
 description = "A truecolor, self-learning terminal screensaver"
