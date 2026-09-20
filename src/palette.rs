@@ -133,6 +133,14 @@ impl Palette {
         Palette::all().into_iter().find(|p| p.name == name)
     }
 
+    pub fn from_prompt(name: &str) -> Option<Palette> {
+        use rand::{SeedableRng, seq::IndexedRandom};
+        let seed = hash_seed(name);
+        let mut rng = rand_chacha::ChaCha8Rng::seed_from_u64(seed);
+        let all = Palette::all();
+        all.choose(&mut rng).cloned()
+    }
+
     pub fn random(rng: &mut rand_chacha::ChaCha8Rng) -> Palette {
         use rand::seq::IndexedRandom;
         let all = Palette::all();

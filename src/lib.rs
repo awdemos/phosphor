@@ -1,5 +1,9 @@
 pub mod clock;
 pub mod engine;
+pub mod generative;
 pub mod glyph;
+pub mod llm;
+pub mod lock;
+pub mod modes;
 pub mod palette;
 pub mod prefs;
