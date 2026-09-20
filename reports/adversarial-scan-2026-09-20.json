@@ -1,0 +1,10 @@
+{
+  "matches": [],
+  "scanned_files": 27,
+  "total_lines": 8615,
+  "triage_count": 0,
+  "tool": "adversarial.sh CLI v0.5.0",
+  "command": "adversarial scan . --agent opencode --record /tmp/phosphor-scan.record --format json",
+  "date": "2026-09-20",
+  "notes": "Deep triage agent returned no usable verdicts (opencode non-interactive JSON verdict format not produced in this environment), so results are from the offline regex engine. No adversarial patterns found."
+}
