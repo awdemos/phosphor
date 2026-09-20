@@ -62,6 +62,10 @@ impl Mode for Plasma {
     fn set_palette(&mut self, palette: Palette) {
         self.palette = palette;
     }
+
+    fn current_palette(&self) -> &Palette {
+        &self.palette
+    }
 }
 
 #[cfg(test)]

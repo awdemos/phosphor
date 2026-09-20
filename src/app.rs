@@ -1,6 +1,6 @@
 use crate::engine::Canvas;
 use crate::lock::Secret;
-use crate::modes::{self, Mode, generative::Generative};
+use crate::modes::{self, generative::Generative, Mode};
 use crate::prefs::{self, Prefs};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
@@ -46,6 +46,7 @@ pub enum Input {
     Faster,
     Slower,
     NextPalette,
+    Pause,
     Char(char),
     Backspace,
     Submit,
@@ -71,6 +72,8 @@ pub struct App {
     entered: Secret,
     wrong_timer: f64,
     unlock_glow: f64,
+    paused: bool,
+    paused_t: f64,
 }
 
 const FADE_SECS: f64 = 1.2;
@@ -121,6 +124,8 @@ impl App {
             entered: Secret::new(""),
             wrong_timer: 0.0,
             unlock_glow: 0.0,
+            paused: false,
+            paused_t: 0.0,
         };
         if app.modes.is_empty() {
             app.modes
@@ -161,6 +166,10 @@ impl App {
         self.dwell += dt;
         self.since_rotate += dt;
 
+        if self.paused {
+            return;
+        }
+
         for input in inputs {
             match input {
                 Input::Quit => self.quit = true,
@@ -182,6 +191,10 @@ impl App {
                 Input::NextPalette => {
                     let p = crate::palette::Palette::random(&mut self.rng);
                     self.modes[self.current].set_palette(p);
+                }
+                Input::Pause => {
+                    self.paused = !self.paused;
+                    self.paused_t = self.t;
                 }
                 _ => {}
             }
@@ -332,11 +345,17 @@ impl App {
             return &self.canvas;
         }
         let t = self.t;
-        self.modes[self.current].render(&mut self.canvas, t);
+        if !self.paused {
+            self.modes[self.current].render(&mut self.canvas, t);
+        } else {
+            self.modes[self.current].render(&mut self.canvas, self.paused_t);
+        }
         if let Some((from, ft)) = &self.fade_from {
             let blended = from.blend(&self.canvas, *ft);
             self.canvas = blended;
         }
+
+        self.render_help_bar();
 
         if self.locked {
             self.render_lock_overlay();
@@ -345,6 +364,71 @@ impl App {
         }
 
         &self.canvas
+    }
+
+    fn render_help_bar(&mut self) {
+        let (w, h) = (self.canvas.width as i32, self.canvas.height as i32);
+        if h < 5 || w < 30 {
+            return;
+        }
+        let bg = crate::palette::Rgb::new(20, 22, 28);
+        // Dim the bottom two rows behind the help bar so text stays readable.
+        let y0 = h - 2;
+        for y in y0..h {
+            for x in 0..w {
+                if let Some(cell) = self.canvas.get(x, y) {
+                    if cell.ch == ' ' || cell.ch == '\0' {
+                        self.canvas.put(x, y, ' ', bg);
+                    } else {
+                        self.canvas.put(x, y, cell.ch, cell.fg.scale(0.45));
+                    }
+                }
+            }
+        }
+
+        let fg = crate::palette::Rgb::new(180, 190, 210);
+        let hi = crate::palette::Rgb::new(100, 220, 255);
+        let muted = fg.scale(0.6);
+        let speed_label = format!("{:.1}x", self.prefs.speed);
+
+        // Line 1: controls
+        let line = "[←→n] mode [p] palette [l] like [d] dislike [-] slower [+] faster [space] pause [q] quit";
+        let text_w = line.chars().count() as i32;
+        let x = (w - text_w) / 2;
+        let mut cx = x;
+        for token in line.split_inclusive(']') {
+            // Each token is either "[X] label " or trailing plain text.
+            if let Some(close) = token.find(']') {
+                let key = &token[1..close];
+                let rest = &token[close + 1..];
+                self.canvas.text(cx, y0, "[", muted);
+                cx += 1;
+                self.canvas.text(cx, y0, key, hi);
+                cx += key.chars().count() as i32;
+                self.canvas.text(cx, y0, "]", muted);
+                cx += 1;
+                if !rest.is_empty() {
+                    self.canvas.text(cx, y0, rest, fg);
+                    cx += rest.chars().count() as i32;
+                }
+            } else {
+                self.canvas.text(cx, y0, token, fg);
+                cx += token.chars().count() as i32;
+            }
+        }
+
+        // Line 2: status
+        let paused = self.paused;
+        let mode = self.current_name();
+        let status = format!(
+            "mode: {}  palette: {}  speed: {}  {}",
+            mode,
+            self.modes[self.current].current_palette().name,
+            speed_label,
+            if paused { "PAUSED" } else { "running" }
+        );
+        let sw = status.chars().count() as i32;
+        self.canvas.text((w - sw) / 2, h - 1, &status, muted);
     }
 
     fn render_lock_overlay(&mut self) {

@@ -87,6 +87,7 @@ fn map_key_unlocked(key: KeyEvent) -> Input {
         KeyCode::Char('+') | KeyCode::Char('=') => Input::Faster,
         KeyCode::Char('-') => Input::Slower,
         KeyCode::Char('p') | KeyCode::Char('P') => Input::NextPalette,
+        KeyCode::Char(' ') => Input::Pause,
         _ => Input::Quit,
     }
 }

@@ -104,6 +104,10 @@ impl Mode for Generative {
     fn set_palette(&mut self, palette: Palette) {
         self.inner.set_palette(palette);
     }
+
+    fn current_palette(&self) -> &Palette {
+        self.inner.current_palette()
+    }
 }
 
 #[cfg(test)]

@@ -228,6 +228,10 @@ impl Mode for Orbital {
     fn set_palette(&mut self, palette: Palette) {
         self.palette = palette;
     }
+
+    fn current_palette(&self) -> &Palette {
+        &self.palette
+    }
 }
 
 #[cfg(test)]

@@ -11,15 +11,19 @@ Build and run the screensaver right now:
     git clone https://github.com/awdemos/phosphor.git
     cd phosphor
     cargo build --release
-    ./target/release/phosphor --seed 42 --scripted --offline --no-learn
+    ./target/release/phosphor --seed 42 --scripted --offline --no-learn --duration 10
 
 Press any key to exit. Use your terminal's fullscreen key (e.g. F11) for the full effect.
+In a headless/TMUX environment wrap the binary in `script` to allocate a TTY:
+
+    script -qec "./target/release/phosphor --seed 42 --scripted --offline --no-learn --duration 10" /dev/null
 
 ## Install
 
 Install from git with Cargo:
 
     cargo install --git https://github.com/awdemos/phosphor
+    phosphor --seed 42 --scripted --offline --no-learn --duration 10
 
 Or build from source:
 
@@ -41,11 +45,21 @@ The binary is then available at `./target/release/phosphor`.
 
 `phosphor` (no args) runs `wander`: it rotates through modes on a learned schedule — it watches how long you linger, which palettes you keep, what you skip, and quietly re-weights what it shows you. All learning stays in `~/.local/share/phosphor/prefs.json`. `phosphor stats` shows what it learned; `phosphor forget` wipes it.
 
-## Keys
+## Controls
 
-    ← → n   switch mode (counts as a skip)      p   next palette
-    l d     like / dislike (feeds the learner)  +/- playback speed (learned)
-    q esc   exit (any other key exits too)
+A subtle menu bar is rendered at the bottom of the screen:
+
+    [←→n] mode  [p] palette  [l] like  [d] dislike  [-] slower  [+] faster  [space] pause  [q] quit
+
+| key | action |
+|---|---|
+| ← / → / n | switch mode (counts as a skip) |
+| p | next palette |
+| l | like current mode/palette (feeds the learner) |
+| d | dislike current mode (rotates away and records a dislike) |
+| - / + | slow down / speed up animation playback |
+| space | pause/unpause the current mode (keeps the current style on screen) |
+| q / Esc | exit |
 
 When locked, only Backspace and Enter work; everything else is ignored.
 

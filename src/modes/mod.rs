@@ -16,6 +16,7 @@ pub trait Mode: Send {
     fn render(&self, canvas: &mut Canvas, t: f64);
     fn palette_name(&self) -> String;
     fn set_palette(&mut self, palette: Palette);
+    fn current_palette(&self) -> &Palette;
 }
 
 #[cfg(test)]
