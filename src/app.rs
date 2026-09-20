@@ -1,6 +1,6 @@
 use crate::engine::Canvas;
 use crate::lock::Secret;
-use crate::modes::{self, generative::Generative, Mode};
+use crate::modes::{self, Mode, generative::Generative};
 use crate::prefs::{self, Prefs};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;

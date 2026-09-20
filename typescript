@@ -1,0 +1,4 @@
+Script started on 2026-09-20 10:55:56-05:00 [COMMAND="phosphor --mode generative --prompt 'neon cyberpunk rain' --duration 30" TERM="tmux-256color" TTY="/dev/pts/14" COLUMNS="71" LINES="44"]
+bash: line 1: phosphor: command not found
+
+Script done on 2026-09-20 10:55:56-05:00 [COMMAND_EXIT_CODE="127"]

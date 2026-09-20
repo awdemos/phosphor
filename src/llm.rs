@@ -63,12 +63,17 @@ fn probe_model(base: &str) -> Option<String> {
 
 pub fn parse_chat_content(body: &str) -> Option<String> {
     let v: serde_json::Value = serde_json::from_str(body).ok()?;
-    v["choices"][0]["message"]["content"]
-        .as_str()
+    // Some reasoning models (e.g. cowabunga-doc) put the JSON in `reasoning`
+    // and leave `content` empty, especially with low max_tokens.
+    let content = v["choices"][0]["message"]["content"].as_str();
+    let reasoning = v["choices"][0]["message"]["reasoning"].as_str();
+    content
+        .filter(|s| !s.trim().is_empty())
+        .or(reasoning)
         .map(str::to_string)
 }
 
-const SYSTEM_PROMPT: &str = "You design terminal screensaver scenes. Reply with ONLY a JSON object: {\"palette\": one of ember,lagoon,orchard,polaris,rainforest,monolith, \"mode\": one of orbital,rain,plasma,pipes, \"density\": 0..1, \"speed\": 0..1, \"glyphs\": one of katakana,braille,ascii,blocks, \"hue_drift\": 0..1}. Invent a fresh variation on the given theme.";
+const SYSTEM_PROMPT: &str = "Reply with one line of JSON only.\n\nExample: {\"palette\":\"ember\",\"mode\":\"rain\",\"density\":0.5,\"speed\":0.6,\"glyphs\":\"katakana\",\"hue_drift\":0.3}\n\npalette: ember, lagoon, orchard, polaris, rainforest, monolith\nmode: orbital, rain, plasma, pipes\nglyphs: katakana, braille, ascii, blocks";
 
 /// Ask the LLM for a scene; None on any failure (caller falls back to the
 /// offline synthesizer).
@@ -79,11 +84,12 @@ pub fn fetch_spec(config: &LlmConfig, prompt: &str) -> Option<SceneSpec> {
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ],
-        "temperature": 0.9,
-        "max_tokens": 300,
+        "temperature": 0.7,
+        "max_tokens": 4000,
+        "stream": false,
     });
     let mut req = ureq::post(&format!("{}/chat/completions", config.base))
-        .timeout(std::time::Duration::from_secs(5))
+        .timeout(std::time::Duration::from_secs(30))
         .set("Content-Type", "application/json");
     if let Some(key) = &config.api_key {
         req = req.set("Authorization", &format!("Bearer {key}"));
@@ -113,12 +119,11 @@ mod tests {
     }
 
     #[test]
-    fn parse_chat_content_reads_openai_shape() {
-        let body = r#"{"choices":[{"message":{"content":"{\"palette\":\"ember\"}"}}]}"#;
+    fn parse_chat_content_falls_back_to_reasoning() {
+        let body =
+            r#"{"choices":[{"message":{"content":"","reasoning":"{\"palette\":\"ember\"}"}}]}"#;
         let c = parse_chat_content(body).unwrap();
         assert!(c.contains("ember"));
-        assert!(parse_chat_content("{}").is_none());
-        assert!(parse_chat_content("not json").is_none());
     }
 
     #[test]
