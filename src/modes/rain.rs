@@ -40,7 +40,7 @@ impl Rain {
     /// Deterministic glyph for a cell so rain shimmers without extra state.
     fn cell_glyph(&self, x: i32, y: i32, t: f64) -> char {
         let bucket = ((t * 6.0) as i64 ^ (x as i64 * 31) ^ (y as i64 * 17)).unsigned_abs() as usize;
-        let set = if bucket.is_multiple_of(3) {
+        let set = if bucket % 3 == 0 {
             KATAKANA
         } else {
             BRAILLE

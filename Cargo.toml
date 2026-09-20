@@ -1,9 +1,14 @@
 [package]
 name = "phosphor"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "A truecolor, self-learning terminal screensaver"
 license = "MIT"
+authors = ["awdemos"]
+repository = "https://github.com/awdemos/phosphor"
+keywords = ["screensaver", "terminal", "ratatui", "tui", "generative"]
+categories = ["command-line-utilities"]
+rust-version = "1.85"
 
 [dependencies]
 ratatui = "0.29"
@@ -18,3 +23,7 @@ ureq = { version = "2", features = ["json"] }
 
 [dev-dependencies]
 tempfile = "3"
+
+[[bin]]
+name = "phosphor"
+path = "src/main.rs"
