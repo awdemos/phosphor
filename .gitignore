@@ -1,4 +1,6 @@
 /target
 .omo/
-# asciinema demo artifacts (large; keep the committed ones, ignore stray casts)
-demo.cast
+# asciinema demo artifacts (large; keep committed for GitHub, exclude from crates.io package)
+*.cast
+*.gif
+*.svg
