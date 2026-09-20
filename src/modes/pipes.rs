@@ -47,9 +47,11 @@ impl Pipes {
             Dir { x: 0, y: 1 },
             Dir { x: 0, y: -1 },
         ];
+        let safe_w = (w.saturating_sub(2)).max(3);
+        let safe_h = (h.saturating_sub(2)).max(3);
         Walker {
-            x: rng.random_range(2..w.saturating_sub(2)),
-            y: rng.random_range(2..h.saturating_sub(2)),
+            x: rng.random_range(2..safe_w),
+            y: rng.random_range(2..safe_h),
             dir: dirs[rng.random_range(0..4)],
             life: 8.0 + rng.random::<f64>() * 20.0,
             phase: rng.random::<f64>(),
