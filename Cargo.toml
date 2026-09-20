@@ -2,5 +2,19 @@
 name = "phosphor"
 version = "0.1.0"
 edition = "2024"
+description = "A truecolor, self-learning terminal screensaver"
+license = "MIT"
 
 [dependencies]
+ratatui = "0.29"
+crossterm = "0.28"
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rand = "0.9"
+rand_chacha = "0.9"
+dirs = "6"
+ureq = { version = "2", features = ["json"] }
+
+[dev-dependencies]
+tempfile = "3"
