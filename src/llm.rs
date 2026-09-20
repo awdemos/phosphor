@@ -89,7 +89,7 @@ pub fn fetch_spec(config: &LlmConfig, prompt: &str) -> Option<SceneSpec> {
         "stream": false,
     });
     let mut req = ureq::post(&format!("{}/chat/completions", config.base))
-        .timeout(std::time::Duration::from_secs(30))
+        .timeout(std::time::Duration::from_secs(90))
         .set("Content-Type", "application/json");
     if let Some(key) = &config.api_key {
         req = req.set("Authorization", &format!("Bearer {key}"));
