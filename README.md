@@ -4,6 +4,31 @@ A truecolor, self-learning terminal screensaver with an optional password-protec
 
 ![phosphor demo](demo.gif)
 
+## Quick start
+
+Build and run the screensaver right now:
+
+    git clone https://github.com/awdemos/phosphor.git
+    cd phosphor
+    cargo build --release
+    ./target/release/phosphor --seed 42 --scripted --offline --no-learn
+
+Press any key to exit. Use your terminal's fullscreen key (e.g. F11) for the full effect.
+
+## Install
+
+Install from git with Cargo:
+
+    cargo install --git https://github.com/awdemos/phosphor
+
+Or build from source:
+
+    git clone https://github.com/awdemos/phosphor.git
+    cd phosphor
+    cargo build --release
+
+The binary is then available at `./target/release/phosphor`.
+
 ## Modes
 
 | mode | what it does |
@@ -15,12 +40,6 @@ A truecolor, self-learning terminal screensaver with an optional password-protec
 | `generative` | re-themes itself from an LLM prompt (or offline hash-synthesis) |
 
 `phosphor` (no args) runs `wander`: it rotates through modes on a learned schedule — it watches how long you linger, which palettes you keep, what you skip, and quietly re-weights what it shows you. All learning stays in `~/.local/share/phosphor/prefs.json`. `phosphor stats` shows what it learned; `phosphor forget` wipes it.
-
-## Install
-
-    cargo install --git https://github.com/awdemos/phosphor
-
-Or build from source: `cargo build --release` → `target/release/phosphor`. Run it fullscreen with your terminal's fullscreen key (e.g. F11) for the full effect. Any keypress or mouse movement exits — it's a screensaver.
 
 ## Keys
 
@@ -65,4 +84,11 @@ Every mode rotation records dwell seconds (and palette dwell, skips, likes, disl
 
 ## Demo
 
-`demo.cast` is the raw asciinema recording (10s, seeded); `demo.svg` the same thing in vector form.
+`demo.cast` is the raw asciinema recording (10s, seeded); `demo.svg` the same thing in vector form. The exact command used to record it is:
+
+    cargo build --release
+    asciinema rec --overwrite -c "./target/release/phosphor --seed 42 --scripted --offline --no-learn --duration 10" demo.cast
+
+## License
+
+MIT — see [LICENSE](LICENSE).
