@@ -18,9 +18,11 @@ OS-level fullscreen (e.g. F11) composes on top for literal fullscreen.
 
 Single binary crate, modules with one clear responsibility each:
 
-- `main.rs` — clap CLI: `run` (default), `stats`, `forget`; flags `--mode`,
-  `--prompt`, `--seed`, `--fps`, `--duration`, `--no-learn`, `--offline`,
-  `--scripted`.
+- `main.rs` — clap CLI: `run` (default), `stats`, `forget`, `lock`; flags
+  `--mode`, `--prompt`, `--seed`, `--fps`, `--duration`, `--no-learn`,
+  `--offline`, `--scripted`, `--password` / env `PHOSPHOR_PASSWORD`.
+- `lock.rs` — password-protected lock overlay: constant-time compare, locked
+  input state, on-screen unlock prompt.
 - `app.rs` — owns the event loop: fixed-timestep updates, mode scheduler,
   crossfades, key input, terminal restore on exit/panic.
 - `engine.rs` — frame clock (delta time), FPS cap, canvas helpers
@@ -69,9 +71,13 @@ short recording); `--duration` auto-exits.
 
 ## Keys
 
-`←/→/n` switch mode (skip signal), `l`/`d` like/dislike, `+/-` speed, `p` next
+Unlocked: `←/→/n` switch mode, `l`/`d` like/dislike, `+/-` speed, `p` next
 palette, `q`/Esc/any other key exits. Mouse movement exits when mouse capture is
 enabled.
+
+Locked (`phosphor lock`): printable characters type the password, `Backspace`
+deletes, `Enter` submits; all other keys are ignored. The animation freezes
+until the correct password is entered.
 
 ## Error handling
 
@@ -87,6 +93,9 @@ scheduler no-repeat property, LLM JSON extraction). Integration tests drive the
 real app on ratatui `TestBackend`: fixed-size frames, mid-run resize, min-size
 guard, `--duration` auto-exit, non-blank output. Gate:
 `cargo fmt --check && cargo clippy -- -D warnings && cargo test`.
+
+- lock state: password entry, constant-time comparison, unlock prompt overlay,
+  freezing animation while locked, dwell/learning paused while locked.
 
 ## Pre-ship bug sweep
 
