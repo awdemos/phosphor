@@ -1,2 +1,4 @@
 /target
+.omo/
+# asciinema demo artifacts (large; keep the committed ones, ignore stray casts)
 demo.cast
