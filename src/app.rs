@@ -106,7 +106,7 @@ impl App {
             .unwrap_or_default();
         let locked = config.locked && config.password.is_some();
         let mut app = Self {
-            rotate_every: if config.scripted { 3.3 } else { 45.0 },
+            rotate_every: if config.scripted { 10.0 } else { 45.0 },
             config,
             modes: mode_list,
             current: 0,
@@ -265,9 +265,10 @@ impl App {
         let next = if self.config.scripted {
             let n = self.modes.len();
             if n > 1 {
+                // Step forward one slot, skipping any mode with the same name
+                // as the current one (can happen with generative wrapping to a
+                // concrete inner mode).
                 let mut candidate = (self.current + 1) % n;
-                // If the simple cycle wraps back to the same name (shouldn't
-                // when all names are unique), keep moving until different.
                 while self.modes[candidate].name() == self.modes[old].name() && candidate != old {
                     candidate = (candidate + 1) % n;
                 }
@@ -279,8 +280,6 @@ impl App {
             self.weighted_pick()
         };
         if next == old {
-            // Even if we can't switch, we still want to keep the timer from
-            // piling up into a burst of rotations.
             self.since_rotate = 0.0;
             self.dwell = 0.0;
             return;
@@ -292,7 +291,7 @@ impl App {
         self.since_rotate = 0.0;
         self.dwell = 0.0;
         self.rotate_every = if self.config.scripted {
-            3.3
+            10.0
         } else {
             40.0 + self.rng.random::<f64>() * 15.0
         };
@@ -577,14 +576,14 @@ mod tests {
             learn: false,
             ..Config::default()
         });
-        // With 5 modes and a 3.3 s rotation, 10 s guarantees ~3 rotations.
-        for _ in 0..120 {
+        // With 5 modes and a 10.0 s rotation, warm up for one full cycle then
+        // collect transitions over the next full cycle.
+        for _ in 0..100 {
             app.update(0.1, &[]);
         }
-        // Collect modes over another full cycle window.
         let mut seen = std::collections::HashSet::new();
         let mut last = String::new();
-        for _ in 0..120 {
+        for _ in 0..550 {
             app.update(0.1, &[]);
             let now = app.current_name().to_string();
             if now != last {
@@ -592,7 +591,7 @@ mod tests {
                 last = now;
             }
         }
-        for want in ["orbital", "rain", "plasma", "pipes"] {
+        for want in ["orbital", "rain", "plasma", "pipes", "generative"] {
             assert!(
                 seen.contains(want),
                 "scripted mode cycle should show {want}"

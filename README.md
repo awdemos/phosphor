@@ -45,6 +45,20 @@ The binary is then available at `./target/release/phosphor`.
 
 `phosphor` (no args) runs `wander`: it rotates through modes on a learned schedule — it watches how long you linger, which palettes you keep, what you skip, and quietly re-weights what it shows you. All learning stays in `~/.local/share/phosphor/prefs.json`. `phosphor stats` shows what it learned; `phosphor forget` wipes it.
 
+## LLM-generated screensaver
+
+With a local OpenAI-compatible endpoint running (Ollama on :11434, llama.cpp server on :8080, or any compatible server), run generative mode:
+
+    export PHOSPHOR_LLM_URL=http://localhost:11434/v1
+    export PHOSPHOR_LLM_MODEL=llama3.2
+    phosphor --mode generative --prompt "deep ocean phosphorescence" --duration 30
+
+If the endpoint is unreachable it falls back to deterministic offline synthesis seeded from the prompt.
+
+To record a 20-second LLM-driven loop:
+
+    asciinema rec --overwrite -c "phosphor --mode generative --prompt 'neon cyberpunk rain' --duration 20" llm-demo.cast
+
 ## Controls
 
 A subtle menu bar is rendered at the bottom of the screen:

@@ -88,6 +88,7 @@ fn map_key_unlocked(key: KeyEvent) -> Input {
         KeyCode::Char('-') => Input::Slower,
         KeyCode::Char('p') | KeyCode::Char('P') => Input::NextPalette,
         KeyCode::Char(' ') => Input::Pause,
+        KeyCode::Esc | KeyCode::Char('q') | KeyCode::Char('Q') => Input::Quit,
         _ => Input::Quit,
     }
 }
@@ -307,7 +308,9 @@ mod tests {
         assert_eq!(map_key_unlocked(k(KeyCode::Char('+'))), Input::Faster);
         assert_eq!(map_key_unlocked(k(KeyCode::Char('-'))), Input::Slower);
         assert_eq!(map_key_unlocked(k(KeyCode::Char('p'))), Input::NextPalette);
+        assert_eq!(map_key_unlocked(k(KeyCode::Char(' '))), Input::Pause);
         assert_eq!(map_key_unlocked(k(KeyCode::Esc)), Input::Quit);
+        assert_eq!(map_key_unlocked(k(KeyCode::Char('q'))), Input::Quit);
         assert_eq!(map_key_unlocked(k(KeyCode::Char('x'))), Input::Quit);
     }
 
