@@ -1,5 +1,4 @@
-use rand::Rng;
-use rand::seq::IndexedRandom;
+use rand::{Rng, seq::IndexedRandom};
 use rand_chacha::ChaCha8Rng;
 
 /// Luminance ramp, dimmest to brightest. Used for density-mapped rendering
@@ -10,8 +9,10 @@ pub const KATAKANA: &[char] = &[
     'ｱ', 'ｶ', 'ｻ', 'ﾀ', 'ﾅ', 'ﾊ', 'ﾏ', 'ﾔ', 'ﾗ', 'ﾜ', 'ｦ', 'ﾝ', 'ｼ', 'ｷ', 'ｸ',
 ];
 pub const BRAILLE: &[char] = &['⠁', '⠃', '⠇', '⠧', '⠷', '⠿', '⡿', '⣿'];
-pub const ASCII_SET: &[char] = &['0', '1', '%', '$', '#', '@', '=', '+', '*', ':', '.'];
-pub const BLOCKS: &[char] = &['░', '▒', '▓', '█'];
+#[allow(dead_code)]
+const ASCII_SET: &[char] = &['0', '1', '%', '$', '#', '@', '=', '+', '*', ':', '.'];
+#[allow(dead_code)]
+const BLOCKS: &[char] = &['░', '▒', '▓', '█'];
 
 pub fn ramp_char(level: f64) -> char {
     let level = level.clamp(0.0, 1.0);
@@ -46,6 +47,7 @@ impl GlyphSet {
         }
     }
 
+    #[allow(dead_code)]
     pub fn random(rng: &mut ChaCha8Rng) -> GlyphSet {
         match rng.random_range(0..4) {
             0 => GlyphSet::Katakana,
@@ -55,6 +57,7 @@ impl GlyphSet {
         }
     }
 
+    #[allow(dead_code)]
     pub fn pick(self, rng: &mut ChaCha8Rng) -> char {
         let set: &[char] = match self {
             GlyphSet::Katakana => KATAKANA,

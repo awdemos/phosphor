@@ -4,7 +4,7 @@ use crate::generative::SceneSpec;
 use crate::llm::{self, LlmConfig};
 use crate::modes::{orbital::Orbital, pipes::Pipes, plasma::Plasma, rain::Rain};
 use crate::palette::Palette;
-use rand::{Rng, RngCore, SeedableRng};
+use rand::{RngCore, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 
 const EPOCH_SECS: f64 = 40.0;
@@ -22,12 +22,7 @@ pub struct Generative {
 }
 
 impl Generative {
-    pub fn new(
-        seed: u64,
-        prompt: Option<String>,
-        llm: Option<LlmConfig>,
-        offline: bool,
-    ) -> Self {
+    pub fn new(seed: u64, prompt: Option<String>, llm: Option<LlmConfig>, offline: bool) -> Self {
         let prompt = prompt.unwrap_or_else(|| "slow aurora over a data center".to_string());
         let spec = SceneSpec::from_prompt(&prompt);
         let inner = Self::instantiate(&spec, seed);
@@ -42,6 +37,7 @@ impl Generative {
         }
     }
 
+    #[cfg(test)]
     pub fn spec(&self) -> &SceneSpec {
         &self.spec
     }
@@ -89,8 +85,12 @@ impl Mode for Generative {
             self.retheme(0.0, seed);
         }
         let _ = rng;
-        self.inner
-            .update(dt, size, &mut self.synth_rng, speed * self.spec.speed.max(0.05));
+        self.inner.update(
+            dt,
+            size,
+            &mut self.synth_rng,
+            speed * self.spec.speed.max(0.05),
+        );
     }
 
     fn render(&self, canvas: &mut Canvas, t: f64) {

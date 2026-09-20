@@ -44,7 +44,9 @@ impl SceneSpec {
         let mode = ["orbital", "rain", "plasma", "pipes"][rng.random_range(0..4)];
         let glyphs = ["katakana", "braille", "ascii", "blocks"][rng.random_range(0..4)];
         SceneSpec {
-            palette: palettes[rng.random_range(0..palettes.len())].name.to_string(),
+            palette: palettes[rng.random_range(0..palettes.len())]
+                .name
+                .to_string(),
             mode: mode.to_string(),
             density: 0.2 + rng.random::<f64>() * 0.8,
             speed: 0.2 + rng.random::<f64>() * 0.8,
@@ -94,7 +96,10 @@ pub fn extract_spec(text: &str) -> Option<SceneSpec> {
             .and_then(|v| v.as_str())
             .unwrap_or("mix")
             .to_string(),
-        hue_drift: value.get("hue_drift").and_then(|v| v.as_f64()).unwrap_or(0.3),
+        hue_drift: value
+            .get("hue_drift")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.3),
     };
     Some(spec.sanitize())
 }

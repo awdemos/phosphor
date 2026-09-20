@@ -51,20 +51,20 @@ impl Canvas {
         self.idx(x, y).map(|i| self.cells[i])
     }
 
+    #[cfg(test)]
     pub fn is_blank(&self) -> bool {
         self.cells.iter().all(|c| c.ch == ' ' || c.ch == '\0')
+    }
+
+    pub fn scale_colors(&mut self, factor: f64) {
+        for cell in &mut self.cells {
+            cell.fg = cell.fg.scale(factor);
+        }
     }
 
     pub fn text(&mut self, x: i32, y: i32, s: &str, fg: Rgb) {
         for (i, ch) in s.chars().enumerate() {
             self.put(x + i as i32, y, ch, fg);
-        }
-    }
-
-    /// Dim or brighten all foreground colors uniformly.
-    pub fn scale_colors(&mut self, factor: f64) {
-        for cell in &mut self.cells {
-            cell.fg = cell.fg.scale(factor);
         }
     }
 

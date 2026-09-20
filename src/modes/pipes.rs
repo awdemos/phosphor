@@ -94,12 +94,7 @@ impl Mode for Pipes {
                 }
                 let nx = walker.x + walker.dir.x;
                 let ny = walker.y + walker.dir.y;
-                if walker.life <= 0.0
-                    || nx < 1
-                    || ny < 1
-                    || nx >= w - 1
-                    || ny >= h - 1
-                {
+                if walker.life <= 0.0 || nx < 1 || ny < 1 || nx >= w - 1 || ny >= h - 1 {
                     *walker = Self::spawn(rng, w, h);
                     break;
                 }
@@ -119,7 +114,8 @@ impl Mode for Pipes {
         if self.grid.len() > 4000 {
             let threshold = (self.hue % 1.0) - 0.5;
             let len = self.grid.len();
-            self.grid.retain(|_, (_, ph)| *ph > threshold || len <= 4000);
+            self.grid
+                .retain(|_, (_, ph)| *ph > threshold || len <= 4000);
         }
     }
 

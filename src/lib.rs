@@ -1,3 +1,4 @@
+pub mod app;
 pub mod clock;
 pub mod engine;
 pub mod generative;

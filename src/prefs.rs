@@ -103,12 +103,11 @@ impl Prefs {
 
 /// `PHOSPHOR_STATE_DIR` override, else XDG data dir (`~/.local/share/phosphor`).
 pub fn state_dir() -> Option<PathBuf> {
-    if let Ok(d) = std::env::var("PHOSPHOR_STATE_DIR") {
-        if !d.is_empty() {
-            return Some(PathBuf::from(d));
-        }
+    let env_override = std::env::var("PHOSPHOR_STATE_DIR");
+    match env_override {
+        Ok(d) if !d.is_empty() => Some(PathBuf::from(d)),
+        _ => dirs::data_dir().map(|d| d.join("phosphor")),
     }
-    dirs::data_dir().map(|d| d.join("phosphor"))
 }
 
 pub fn prefs_path() -> Option<PathBuf> {
@@ -175,7 +174,10 @@ mod tests {
         let names = ["orbital", "rain", "plasma", "pipes", "generative"];
         let w = p.weights(&names);
         assert!((w.iter().sum::<f64>() - 1.0).abs() < 1e-9);
-        assert!(w.iter().all(|x| *x > 0.0), "smoothing keeps every mode reachable");
+        assert!(
+            w.iter().all(|x| *x > 0.0),
+            "smoothing keeps every mode reachable"
+        );
         assert!(w[0] > w[1], "dwelled mode outranks the other");
     }
 

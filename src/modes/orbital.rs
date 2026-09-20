@@ -3,7 +3,8 @@ use crate::clock::draw_clock;
 use crate::engine::Canvas;
 use crate::glyph::ramp_char;
 use crate::palette::{Palette, Rgb};
-use rand::{Rng, SeedableRng};
+use rand::Rng;
+use rand::SeedableRng;
 use rand::seq::IndexedRandom;
 use rand_chacha::ChaCha8Rng;
 
@@ -62,8 +63,7 @@ impl Orbital {
                 rx: 0.16 + 0.11 * i as f64,
                 ry: 0.07 + 0.05 * i as f64,
                 angle: rng.random::<f64>() * std::f64::consts::TAU,
-                spin: (0.05 + rng.random::<f64>() * 0.1)
-                    * if i % 2 == 0 { 1.0 } else { -1.0 },
+                spin: (0.05 + rng.random::<f64>() * 0.1) * if i % 2 == 0 { 1.0 } else { -1.0 },
                 sats,
             });
         }
@@ -86,15 +86,9 @@ impl Orbital {
         let p99 = 40.0 + rng.random::<f64>() * 120.0;
         let agents = rng.random_range(3..24);
         let ent = rng.random::<f64>();
-        let mood: &str = *[
-            "luminous",
-            "restless",
-            "serene",
-            "electric",
-            "cryptic",
-        ]
-        .choose(rng)
-        .unwrap_or(&"luminous");
+        let mood: &str = ["luminous", "restless", "serene", "electric", "cryptic"]
+            .choose(rng)
+            .unwrap_or(&"luminous");
         for (k, v) in [
             ("{TOK}", format!("{tok:.0}")),
             ("{GPU}", format!("{gpu:.0}")),
@@ -174,8 +168,8 @@ impl Mode for Orbital {
         // Rings + satellites, centered in the sky region (above the ticker).
         let cx = w as f64 / 2.0;
         let cy = (h - 1) as f64 / 2.0;
-        let rw = w as f64;
-        let rh = (h - 1) as f64;
+        let rw = (w as f64).min((h - 1) as f64) * 0.38;
+        let rh = rw * 0.45;
         for ring in &self.rings {
             let ca = ring.angle.cos();
             let sa = ring.angle.sin();
@@ -195,23 +189,17 @@ impl Mode for Orbital {
                 let x = (cx + px * ca - py * sa) as i32;
                 let y = (cy + px * sa + py * ca) as i32;
                 canvas.put(x, y, '◆', self.palette.sample(0.75));
-                canvas.put(
-                    x + 1,
-                    y,
-                    '»',
-                    self.palette.sample(0.75).scale(0.5),
-                );
+                canvas.put(x + 1, y, '»', self.palette.sample(0.75).scale(0.5));
             }
         }
         // Clock, top center.
         let hhmm = 4 * 8 - 2; // "HH:MM" = 4 digits * 8 + colon gap
         let clock_x = (w - hhmm) / 2;
-        let local = t % 86400.0;
         draw_clock(
             canvas,
             clock_x.max(0),
             1,
-            local,
+            t % 86400.0,
             Rgb::new(220, 230, 255),
             false,
         );
@@ -223,7 +211,12 @@ impl Mode for Orbital {
         for x in 0..w {
             let i = (x + off) % (len + 8);
             if i < len {
-                canvas.put(x, ty, chars[i as usize], self.palette.sample(0.85).scale(0.9));
+                canvas.put(
+                    x,
+                    ty,
+                    chars[i as usize],
+                    self.palette.sample(0.85).scale(0.9),
+                );
             }
         }
     }

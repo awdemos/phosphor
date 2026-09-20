@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
-use std::hash::{Hash, Hasher};
 
+#[cfg(test)]
 fn hash_seed(s: &str) -> u64 {
     use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
     let mut h = DefaultHasher::new();
     s.hash(&mut h);
     h.finish()
@@ -133,9 +134,16 @@ impl Palette {
         Palette::all().into_iter().find(|p| p.name == name)
     }
 
+    #[cfg(test)]
     pub fn from_prompt(name: &str) -> Option<Palette> {
         use rand::{SeedableRng, seq::IndexedRandom};
-        let seed = hash_seed(name);
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let seed = {
+            let mut h = DefaultHasher::new();
+            name.hash(&mut h);
+            h.finish()
+        };
         let mut rng = rand_chacha::ChaCha8Rng::seed_from_u64(seed);
         let all = Palette::all();
         all.choose(&mut rng).cloned()
@@ -179,7 +187,7 @@ fn hsl_to_rgb(h: f64, s: f64, l: f64) -> Rgb {
     let a = s * l.min(1.0 - l);
     let f = |n: f64| {
         let k = (n + h * 12.0) % 12.0;
-        let q = |t: f64| t.max(-1.0).min(1.0);
+        let q = |t: f64| t.clamp(-1.0, 1.0);
         l - a * (q(k - 3.0).min(q(9.0 - k).min(1.0)) - q(k))
     };
     Rgb::new(
@@ -241,7 +249,10 @@ mod tests {
         // 0° red, 120° green, 240° blue in a healthy HSL conversion.
         let red = Rgb::new(255, 0, 0);
         let greenish = red.hue_shift(120.0);
-        assert!(greenish.g > greenish.r, "expected greenish shift, got {greenish:?}");
+        assert!(
+            greenish.g > greenish.r,
+            "expected greenish shift, got {greenish:?}"
+        );
         assert!(greenish.g > greenish.b);
     }
 

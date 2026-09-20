@@ -1,4 +1,4 @@
-use crate::generative::{extract_spec, SceneSpec};
+use crate::generative::{SceneSpec, extract_spec};
 
 #[derive(Clone, Debug)]
 pub struct LlmConfig {

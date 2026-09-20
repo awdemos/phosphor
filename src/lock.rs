@@ -6,6 +6,22 @@ pub struct Secret {
     inner: String,
 }
 
+impl Clone for Secret {
+    fn clone(&self) -> Self {
+        Self {
+            inner: self.inner.clone(),
+        }
+    }
+}
+
+impl std::fmt::Debug for Secret {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Secret")
+            .field("len", &self.inner.len())
+            .finish()
+    }
+}
+
 impl Secret {
     pub fn new(s: impl Into<String>) -> Self {
         Self { inner: s.into() }
@@ -28,6 +44,11 @@ impl Secret {
         self.inner.clear();
     }
 
+    pub fn len(&self) -> usize {
+        self.inner.len()
+    }
+
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
     }

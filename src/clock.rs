@@ -18,14 +18,7 @@ pub const GLYPHS: [[&str; 5]; 11] = [
 
 /// Draw HH:MM (or HH:MM:SS) with top-left at (cx, cy), doubled horizontally
 /// for terminal aspect ratio.
-pub fn draw_clock(
-    canvas: &mut Canvas,
-    cx: i32,
-    cy: i32,
-    t_secs: f64,
-    fg: Rgb,
-    show_seconds: bool,
-) {
+pub fn draw_clock(canvas: &mut Canvas, cx: i32, cy: i32, t_secs: f64, fg: Rgb, show_seconds: bool) {
     let h = (t_secs / 3600.0) as u32 % 24;
     let m = (t_secs / 60.0) as u32 % 60;
     let s = t_secs as u32 % 60;
@@ -87,7 +80,10 @@ mod tests {
                 }
             }
         }
-        assert!(lit > 40, "clock should light up a bunch of cells, got {lit}");
+        assert!(
+            lit > 40,
+            "clock should light up a bunch of cells, got {lit}"
+        );
     }
 
     #[test]

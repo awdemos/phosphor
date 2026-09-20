@@ -1,7 +1,7 @@
 pub mod generative;
 pub mod orbital;
-pub mod plasma;
 pub mod pipes;
+pub mod plasma;
 pub mod rain;
 
 use crate::engine::Canvas;
@@ -18,6 +18,7 @@ pub trait Mode: Send {
     fn set_palette(&mut self, palette: Palette);
 }
 
+#[cfg(test)]
 pub const MODE_NAMES: [&str; 5] = ["orbital", "rain", "plasma", "pipes", "generative"];
 
 /// Build one of the four concrete modes by name (generative has its own ctor).
